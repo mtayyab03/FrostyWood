@@ -1,0 +1,51 @@
+{
+  "expo": {
+    "name": "woodinvision",
+    "slug": "woodinvision",
+    "version": "1.0.0",
+    "orientation": "default",
+    "icon": "./assets/images/icons.png",
+    "scheme": "myapp",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/images/spl.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.woodinvision"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.anonymous.woodinvision",
+      "permissions": [
+        "INTERNET"
+      ]
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "API_URL": "https://bridgeapi.wood-in-vision.com",
+      "API_URL_1": "https:///portal.wood-in-vision.com",
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "69e04d89-9199-48fb-be1b-a34a79e7b1ba"
+      }
+    }
+  }
+}

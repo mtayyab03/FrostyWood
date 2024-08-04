@@ -1,0 +1,44 @@
+{
+  "cli": {
+    "version": ">= 10.0.3"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "env": {
+        "API_URL": "https://bridgeapi.wood-in-vision.com",
+        "API_URL_1": "https:///portal.wood-in-vision.com"
+      }
+    },
+    "preview": {
+      "android": {
+        "buildType": "apk",
+        "env": {
+          "API_URL": "https://bridgeapi.wood-in-vision.com",
+          "API_URL_1": "https:///portal.wood-in-vision.com"
+        }
+      }
+    },
+    "production": {
+      "android": {
+        "image": "latest",
+        "buildType": "apk",
+        "env": {
+          "API_URL": "https://api.example.com",
+          "OTHER_ENV_VAR": "value"
+        }
+      },
+      "ios": {
+        "image": "latest",
+        "env": {
+          "API_URL": "https://api.example.com",
+          "OTHER_ENV_VAR": "value"
+        }
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}
