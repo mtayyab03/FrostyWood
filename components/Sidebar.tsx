@@ -112,6 +112,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     const clickedTask = tasks.find((task) => task.id === taskId);
     if (clickedTask) {
       console.log("x_map GUID:", clickedTask.xMapGuid);
+      onMapGuidChange(clickedTask.xMapGuid || ""); // Pass the xMapGuid to the callback
     }
   };
 

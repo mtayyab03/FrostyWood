@@ -1,11 +1,13 @@
 // components/Header.tsx
 import React from "react";
 import { View, StyleSheet, Button, Image } from "react-native";
-import { useRouter } from "expo-router";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
 
-const Header: React.FC = () => {
-  const router = useRouter();
-
+type RootStackParamList = {
+  login: undefined; // Define other screens here as needed
+};
+const Header: React.FC = (props) => {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   return (
     <View style={styles.header}>
       <Image
@@ -14,7 +16,7 @@ const Header: React.FC = () => {
       />
       <Button
         title="Login"
-        onPress={() => router.push("login")}
+        onPress={() => navigation.navigate("login")}
         color="green"
       />
     </View>

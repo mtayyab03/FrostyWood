@@ -1,7 +1,12 @@
 // app/index.tsx
 import React, { useState, useRef, useEffect } from "react";
 import { View, StyleSheet, Text, TouchableOpacity, Image } from "react-native";
-import MapView, { Polyline, Marker, Polygon } from "react-native-maps";
+import MapView, {
+  Polyline,
+  Marker,
+  Polygon,
+  PROVIDER_GOOGLE,
+} from "react-native-maps";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import Constants from "expo-constants";
 import axios from "axios";
@@ -138,46 +143,21 @@ const HomeScreen: React.FC = () => {
     }
   };
 
-  // useEffect(() => {
-  //   fetchPolygonCoordinates();
-  // }, []);
-
-  // const fetchPolygonCoordinates = async () => {
-  //   try {
-  //     const response = await axios.get('https://portal.wood-in-vision.com/api/v1/blob/06ac11b7-0a8f-47bc-8d20-5e6b3231f11d');
-  //     const parser = new XMLParser();
-  //     const jsonObj = parser.parse(response.data);
-
-  //     console.log("Parsed XML:", jsonObj); // Log to inspect structure
-
-  //     // Access coordinates string
-  //     const coordinatesString = jsonObj.kml?.Document?.Placemark?.[0]?.Polygon?.outerBoundaryIs?.LinearRing?.coordinates;
-
-  //     if (!coordinatesString) {
-  //       throw new Error("Coordinates not found in the XML data");
-  //     }
-
-  //     // Convert coordinates string to array of Coordinate objects
-  //     const coordinatesArray = coordinatesString.trim().split(" ");
-  //     const newCoordinates = coordinatesArray.map(coord => {
-  //       const [longitude, latitude] = coord.split(",").map(Number);
-  //       return { latitude, longitude };
-  //     });
-
-  //     setPolygonCoordinates(newCoordinates);
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
-
   useEffect(() => {
+    // if (selectedMapGuid) {
+    // }
     fetchPolygonCoordinates();
   }, []);
 
   const fetchPolygonCoordinates = async () => {
+    // if (!selectedMapGuid) {
+    //   console.error("No selected map GUID");
+    //   return;
+    // }
+
     try {
       const response = await axios.get(
-        "https://portal.wood-in-vision.com/api/v1/blob/06ac11b7-0a8f-47bc-8d20-5e6b3231f11d"
+        `https://portal.wood-in-vision.com/api/v1/blob/06ac11b7-0a8f-47bc-8d20-5e6b3231f11d`
       );
       const parser = new XMLParser();
       const jsonObj = parser.parse(response.data);
@@ -356,6 +336,7 @@ const HomeScreen: React.FC = () => {
           onMapGuidChange={handleMapGuidChange} // Pass the callback function
         />
         <MapView
+          provider={PROVIDER_GOOGLE}
           mapType="satellite"
           ref={mapRef}
           style={styles.map}

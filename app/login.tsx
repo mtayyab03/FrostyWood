@@ -1,5 +1,6 @@
 // src/screens/LoginScreen.tsx
 import React, { useState } from "react";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
 import {
   View,
   Text,
@@ -9,26 +10,19 @@ import {
   Alert,
   ActivityIndicator,
 } from "react-native";
-import { useRouter } from "expo-router";
 import Constants from "expo-constants";
+type RootStackParamList = {
+  index: undefined; // Define other screens here as needed
+};
+const LoginScreen: React.FC = (props) => {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
-const LoginScreen: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPasswordState] = useState("");
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
+  // const router = useRouter();
 
   const apiUrl = Constants.expoConfig?.extra?.API_URL;
-
-  // const handleWLogin = async () => {
-  //   // Validate input
-  //   if (!email || !password) {
-  //     Alert.alert("Error", "Please fill in all fields.");
-  //     return;
-  //   } else {
-  //     router.push("/");
-  //   }
-  // };
 
   const handleLogin = async () => {
     // const loginName = "demo-admin001"; // Replace with your login name
@@ -49,7 +43,7 @@ const LoginScreen: React.FC = () => {
         }
       );
       if (response.status === 200) {
-        router.push("/");
+        navigation.navigate("index");
       } else {
         Alert.alert("Error", "Invalid credentials.");
       }
