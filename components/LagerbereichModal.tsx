@@ -1,8 +1,14 @@
 // components/LagerbereichModal.tsx
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Dimensions } from 'react-native';
-import Modal from 'react-native-modal';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  Dimensions,
+} from "react-native";
+import Modal from "react-native-modal";
 
 interface LagerbereichModalProps {
   isVisible: boolean;
@@ -10,12 +16,16 @@ interface LagerbereichModalProps {
   onSave: (data: any) => void;
 }
 
-const LagerbereichModal: React.FC<LagerbereichModalProps> = ({ isVisible, onClose, onSave }) => {
-  const [lagerplatzname, setLagerplatzname] = useState('');
-  const [mengeFm, setMengeFm] = useState('');
-  const [mengeStuck, setMengeStuck] = useState('');
-  const [bemerkung, setBemerkung] = useState('');
-  const [status, setStatus] = useState('');
+const LagerbereichModal: React.FC<LagerbereichModalProps> = ({
+  isVisible,
+  onClose,
+  onSave,
+}) => {
+  const [lagerplatzname, setLagerplatzname] = useState("");
+  const [mengeFm, setMengeFm] = useState("");
+  const [mengeStuck, setMengeStuck] = useState("");
+  const [bemerkung, setBemerkung] = useState("");
+  const [status, setStatus] = useState("");
 
   const handleSave = () => {
     const data = {
@@ -95,15 +105,15 @@ const LagerbereichModal: React.FC<LagerbereichModalProps> = ({ isVisible, onClos
 
 const styles = StyleSheet.create({
   modalContent: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     padding: 20,
     borderRadius: 10,
-    width: Dimensions.get('window').width * 0.8,
-    alignSelf: 'center',
+    width: Dimensions.get("window").width * 0.8,
+    alignSelf: "center",
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
   },
   inputGroup: {
@@ -115,25 +125,25 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 40,
-    borderColor: 'gray',
+    borderColor: "gray",
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 10,
   },
   buttonGroup: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginTop: 20,
   },
   button: {
-    backgroundColor: 'green',
+    backgroundColor: "green",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
   },
   buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: "white",
+    fontWeight: "bold",
   },
 });
 

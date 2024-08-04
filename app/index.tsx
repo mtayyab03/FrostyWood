@@ -1,11 +1,12 @@
 // app/index.tsx
 import React, { useState, useRef, useEffect } from "react";
-import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { View, StyleSheet, Text, TouchableOpacity, Image } from "react-native";
 import MapView, { Polyline, Marker, Polygon } from "react-native-maps";
 import Icon from "react-native-vector-icons/MaterialIcons";
-
+import Constants from "expo-constants";
 import axios from "axios";
 import { XMLParser } from "fast-xml-parser";
+import CustomMarker from "../components/CustomMarker";
 
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
@@ -13,8 +14,19 @@ type Coordinate = {
   latitude: number;
   longitude: number;
 };
-
+type MarkerCoordinate = {
+  latitude: number;
+  longitude: number;
+};
 const HomeScreen: React.FC = () => {
+  const [selectedMapGuid, setSelectedMapGuid] = useState<string | null>(null);
+
+  // Callback function to handle the xMapGuid from Sidebar
+  const handleMapGuidChange = (mapGuid: string) => {
+    setSelectedMapGuid(mapGuid);
+    console.log("Selected xMapGuid:", mapGuid);
+    // Add additional logic if needed
+  };
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMeasuring, setIsMeasuring] = useState(false);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -42,6 +54,89 @@ const HomeScreen: React.FC = () => {
     longitudeDelta: 0.0421,
   });
   const mapRef = useRef<MapView>(null);
+  const [storagePlaces, setStoragePlaces] = useState<any[]>([]);
+
+  const [woddlistData, setWoddlistData] = useState<any[]>([]);
+  const [markerCoordinates, setMarkerCoordinates] =
+    useState<MarkerCoordinate | null>(null);
+
+  useEffect(() => {
+    fetchRueckungDetails();
+    console.log("Marke coordinates", markerCoordinates);
+  }, []);
+
+  useEffect(() => {
+    fetchStoragePlaces();
+  }, []);
+
+  const fetchStoragePlaces = async () => {
+    const loginName = "demo-admin001"; // Replace with your login name
+    const password = "XYVJDuke"; // Replace with your password
+
+    try {
+      const response = await fetch(
+        'https://portal.wood-in-vision.com/api/v1/poi?poiUniqueId=global/mechanical_timber_storage&loginNamesQuery=&filter=$.parent.std.guid=="9a87472d-9c10-4427-b45f-4e4d33aeedf1"',
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Basic ${btoa(`${loginName}:${password}`)}`,
+          },
+        }
+      );
+      const result = await response.json();
+      console.log("Fetched Lagerbereich data:", result); // Log the response to understand its structure
+
+      if (Array.isArray(result)) {
+        const locat = result.map((item: any) => ({
+          latitude: item.std.loc.lat,
+          longitude: item.std.loc.lon,
+        }));
+        setStoragePlaces(locat);
+        console.log("Location lat lon data", locat);
+      } else {
+        console.error("Storage data is not an array:", result);
+      }
+    } catch (error) {
+      console.error("Error fetching Storage options:", error);
+    }
+  };
+
+  const fetchRueckungDetails = async () => {
+    const loginName = "demo-admin001"; // Replace with your login name
+    const password = "XYVJDuke"; // Replace with your password
+    const apiUrl = Constants.expoConfig?.extra?.API_URL_1;
+
+    try {
+      const response = await fetch(
+        `${apiUrl}/api/v1/poi?poiUniqueId=global/mechanical_timber_list&loginNamesQuery=${loginName}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Basic ${btoa(`${loginName}:${password}`)}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+      console.log("Fetched woodlist data:", data);
+
+      if (Array.isArray(data)) {
+        setWoddlistData(data);
+
+        // Extract the coordinates
+        if (data.length > 0 && data[0].std && data[0].std.loc) {
+          const { lat, lon } = data[0].std.loc;
+          setMarkerCoordinates({ latitude: lat, longitude: lon });
+        }
+      } else {
+        console.error("woodlist is not an array:", data);
+      }
+    } catch (error) {
+      console.error("Error fetching woodlist details:", error);
+    }
+  };
 
   // useEffect(() => {
   //   fetchPolygonCoordinates();
@@ -121,6 +216,7 @@ const HomeScreen: React.FC = () => {
       console.error(error);
     }
   };
+
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
@@ -257,6 +353,7 @@ const HomeScreen: React.FC = () => {
           onToggle={toggleSidebar}
           setIsDrawing={setIsDrawing}
           lassoArea={lassoArea}
+          onMapGuidChange={handleMapGuidChange} // Pass the callback function
         />
         <MapView
           mapType="satellite"
@@ -284,6 +381,26 @@ const HomeScreen: React.FC = () => {
               strokeWidth={2}
             />
           ))}
+
+          {storagePlaces.map((place, index) => (
+            <Marker key={index} coordinate={place}>
+              <Image
+                source={require("../assets/images/icons.png")} // Update the path to your image
+                style={{ width: 40, height: 40 }} // Adjust size as needed
+              />
+            </Marker>
+          ))}
+
+          {markerCoordinates && (
+            <CustomMarker
+              // {
+              //   latitude: 47.71435438721113,
+              //   longitude: 9.252388626337051,
+              // }
+              coordinate={markerCoordinates}
+              text="0.3"
+            />
+          )}
         </MapView>
         <View style={styles.buttonContainer}>
           <TouchableOpacity

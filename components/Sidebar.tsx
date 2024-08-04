@@ -20,6 +20,7 @@ interface SidebarProps {
   onToggle: () => void;
   setIsDrawing: (isDrawing: boolean) => void;
   lassoArea: number;
+  onMapGuidChange: (mapGuid: string) => void; // Add this prop
 }
 
 interface Task {
@@ -28,6 +29,7 @@ interface Task {
   status: string;
   details: string[];
   guid: string;
+  xMapGuid?: string; // Optional property
   poiUniqueId: string;
 }
 
@@ -36,6 +38,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   onToggle,
   setIsDrawing,
   lassoArea,
+  onMapGuidChange, // Destructure the new prop
 }) => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [activeTaskId, setActiveTaskId] = useState<number | null>(300105);
@@ -66,6 +69,8 @@ const Sidebar: React.FC<SidebarProps> = ({
 
       const data = await response.json();
       console.log("Fetched data:", data);
+      const mapguid = data.poi?.x_map?.guid;
+      console.log("xmap contract guid", mapguid);
 
       if (Array.isArray(data)) {
         const formattedTasks = data.map((item: any) => ({
@@ -80,6 +85,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             `${item.poi.working_team || "Unknown"}`,
           ],
           guid: item.std.guid,
+          xMapGuid: item.poi.x_map?.guid, // Safe access to x_map.guid
           poiUniqueId:
             item.poi.poiUniqueId || "global/mechanical_timber_harvest",
         }));
@@ -103,6 +109,10 @@ const Sidebar: React.FC<SidebarProps> = ({
     setActiveTaskId((prevActiveTaskId) =>
       prevActiveTaskId === taskId ? null : taskId
     );
+    const clickedTask = tasks.find((task) => task.id === taskId);
+    if (clickedTask) {
+      console.log("x_map GUID:", clickedTask.xMapGuid);
+    }
   };
 
   const handleTaskDoubleClick = (task: Task) => {

@@ -37,32 +37,32 @@ const RueckungDetails: React.FC<RueckungDetailsProps> = ({
   const [selectedLagerbereich, setSelectedLagerbereich] = useState<string>("");
 
   // replace data here
-  const dummyData: DataItem[] = [
-    {
-      poi: {
-        log_type: "Type1",
-        log_volume: "10",
-        log_sale_length: "20",
-        log_grade: "A",
-      },
-    },
-    {
-      poi: {
-        log_type: "Type2",
-        log_volume: "15",
-        log_sale_length: "25",
-        log_grade: "B",
-      },
-    },
-    {
-      poi: {
-        log_type: "Type3",
-        log_volume: "12",
-        log_sale_length: "22",
-        log_grade: "C",
-      },
-    },
-  ];
+  // const dummyData: DataItem[] = [
+  //   {
+  //     poi: {
+  //       log_type: "Type1",
+  //       log_volume: "10",
+  //       log_sale_length: "20",
+  //       log_grade: "A",
+  //     },
+  //   },
+  //   {
+  //     poi: {
+  //       log_type: "Type2",
+  //       log_volume: "15",
+  //       log_sale_length: "25",
+  //       log_grade: "B",
+  //     },
+  //   },
+  //   {
+  //     poi: {
+  //       log_type: "Type3",
+  //       log_volume: "12",
+  //       log_sale_length: "22",
+  //       log_grade: "C",
+  //     },
+  //   },
+  // ];
 
   useEffect(() => {
     console.log("Data passed to RueckungDetails:", data);
