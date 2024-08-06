@@ -11,10 +11,12 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import Constants from "expo-constants";
 import axios from "axios";
 import { XMLParser } from "fast-xml-parser";
-import CustomMarker from "../components/CustomMarker";
+import * as Location from "expo-location";
 
+import CustomMarker from "../components/CustomMarker";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
+
 type Coordinate = {
   latitude: number;
   longitude: number;
@@ -25,6 +27,8 @@ type MarkerCoordinate = {
 };
 const HomeScreen: React.FC = () => {
   const [selectedMapGuid, setSelectedMapGuid] = useState<string | null>(null);
+  const [currentLocationMarker, setCurrentLocationMarker] =
+    useState<Coordinate | null>(null);
 
   // Callback function to handle the xMapGuid from Sidebar
   const handleMapGuidChange = (mapGuid: string) => {
@@ -65,6 +69,41 @@ const HomeScreen: React.FC = () => {
   const [markerCoordinates, setMarkerCoordinates] =
     useState<MarkerCoordinate | null>(null);
 
+  const getCurrentLocation = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      console.error("Permission to access location was denied");
+      return;
+    }
+
+    let location = await Location.getCurrentPositionAsync({});
+    const { latitude, longitude } = location.coords;
+
+    setMapRegion({
+      latitude,
+      longitude,
+      latitudeDelta: 0.0922,
+      longitudeDelta: 0.0421,
+    });
+
+    setCurrentLocationMarker({ latitude, longitude });
+
+    if (mapRef.current) {
+      mapRef.current.animateToRegion(
+        {
+          latitude,
+          longitude,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        },
+        1000
+      );
+    }
+  };
+
+  // current location end
+
+  // storage places start api
   useEffect(() => {
     fetchRueckungDetails();
     console.log("Marke coordinates", markerCoordinates);
@@ -107,6 +146,7 @@ const HomeScreen: React.FC = () => {
     }
   };
 
+  // woodlist api
   const fetchRueckungDetails = async () => {
     const loginName = "demo-admin001"; // Replace with your login name
     const password = "XYVJDuke"; // Replace with your password
@@ -144,20 +184,21 @@ const HomeScreen: React.FC = () => {
   };
 
   useEffect(() => {
-    // if (selectedMapGuid) {
-    // }
-    fetchPolygonCoordinates();
-  }, []);
+    if (selectedMapGuid) {
+      fetchPolygonCoordinates();
+    }
+  }, [selectedMapGuid]);
 
+  // polygon coordinate api
   const fetchPolygonCoordinates = async () => {
-    // if (!selectedMapGuid) {
-    //   console.error("No selected map GUID");
-    //   return;
-    // }
+    if (!selectedMapGuid) {
+      console.error("No selected map GUID");
+      return;
+    }
 
     try {
       const response = await axios.get(
-        `https://portal.wood-in-vision.com/api/v1/blob/06ac11b7-0a8f-47bc-8d20-5e6b3231f11d`
+        `https://portal.wood-in-vision.com/api/v1/blob/${selectedMapGuid}`
       );
       const parser = new XMLParser();
       const jsonObj = parser.parse(response.data);
@@ -192,11 +233,46 @@ const HomeScreen: React.FC = () => {
         .filter(Boolean); // Remove any null values
 
       setPolygonCoordinates(newPolygons);
+      if (newPolygons.length > 0) {
+        const { latitude, longitude, latitudeDelta, longitudeDelta } =
+          calculateRegion(newPolygons[0].coordinates);
+        setMapRegion({ latitude, longitude, latitudeDelta, longitudeDelta });
+        if (mapRef.current) {
+          mapRef.current.animateToRegion(
+            {
+              latitude,
+              longitude,
+              latitudeDelta,
+              longitudeDelta,
+            },
+            1000
+          );
+        }
+      }
     } catch (error) {
       console.error(error);
     }
   };
+  const calculateRegion = (coordinates: any) => {
+    let minLat = coordinates[0].latitude;
+    let maxLat = coordinates[0].latitude;
+    let minLon = coordinates[0].longitude;
+    let maxLon = coordinates[0].longitude;
 
+    coordinates.forEach((coord: any) => {
+      if (coord.latitude < minLat) minLat = coord.latitude;
+      if (coord.latitude > maxLat) maxLat = coord.latitude;
+      if (coord.longitude < minLon) minLon = coord.longitude;
+      if (coord.longitude > maxLon) maxLon = coord.longitude;
+    });
+
+    const latitude = (minLat + maxLat) / 2;
+    const longitude = (minLon + maxLon) / 2;
+    const latitudeDelta = (maxLat - minLat) * 1.1; // Add some padding
+    const longitudeDelta = (maxLon - minLon) * 1.1; // Add some padding
+
+    return { latitude, longitude, latitudeDelta, longitudeDelta };
+  };
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
@@ -382,6 +458,10 @@ const HomeScreen: React.FC = () => {
               text="0.3"
             />
           )}
+
+          {currentLocationMarker && (
+            <Marker coordinate={currentLocationMarker} title="Your Location" />
+          )}
         </MapView>
         <View style={styles.buttonContainer}>
           <TouchableOpacity
@@ -404,6 +484,9 @@ const HomeScreen: React.FC = () => {
               <Icon name="delete" size={24} color="#fff" />
             </TouchableOpacity>
           )}
+          <TouchableOpacity style={styles.button} onPress={getCurrentLocation}>
+            <Icon name="location-on" size={24} color="#fff" />
+          </TouchableOpacity>
         </View>
         {isMeasuring && distance > 0 && (
           <View style={styles.distanceContainer}>
