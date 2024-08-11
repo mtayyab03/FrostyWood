@@ -1,6 +1,6 @@
 // components/RueckungDetails.tsx
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import ColorSelectionModal from "./ColorSelectionModal";
@@ -35,7 +35,9 @@ const RueckungDetails: React.FC<RueckungDetailsProps> = ({
   const [activeRowIndex, setActiveRowIndex] = useState<number | null>(null);
   const [lagerbereichOptions, setLagerbereichOptions] = useState<string[]>([]);
   const [selectedLagerbereich, setSelectedLagerbereich] = useState<string>("");
-
+  const handleAbladenPress = () => {
+    Alert.alert("Success", "Wood stored successfully", [{ text: "OK" }]);
+  };
   // replace data here
   // const dummyData: DataItem[] = [
   //   {
@@ -219,7 +221,10 @@ const RueckungDetails: React.FC<RueckungDetailsProps> = ({
             <Text style={styles.addButtonText}>+</Text>
           </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.abladenButton}>
+        <TouchableOpacity
+          style={styles.abladenButton}
+          onPress={handleAbladenPress}
+        >
           <Text style={styles.abladenButtonText}>ABLADEN</Text>
         </TouchableOpacity>
       </View>

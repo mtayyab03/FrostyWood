@@ -8,6 +8,9 @@ import MapView, {
   PROVIDER_GOOGLE,
 } from "react-native-maps";
 import Icon from "react-native-vector-icons/MaterialIcons";
+import Entypo from "react-native-vector-icons/Entypo";
+import { RFPercentage } from "react-native-responsive-fontsize";
+
 import Constants from "expo-constants";
 import axios from "axios";
 import { XMLParser } from "fast-xml-parser";
@@ -26,9 +29,21 @@ type MarkerCoordinate = {
   longitude: number;
 };
 const HomeScreen: React.FC = () => {
+  const [dropdown1, setDropdown1] = useState(false);
+  const [selectedMapType, setSelectedMapType] = useState("satellite");
   const [selectedMapGuid, setSelectedMapGuid] = useState<string | null>(null);
   const [currentLocationMarker, setCurrentLocationMarker] =
     useState<Coordinate | null>(null);
+  const transferLanguage = [
+    {
+      id: 1,
+      name: "standard",
+    },
+    {
+      id: 2,
+      name: "satellite",
+    },
+  ];
 
   // Callback function to handle the xMapGuid from Sidebar
   const handleMapGuidChange = (mapGuid: string) => {
@@ -54,6 +69,8 @@ const HomeScreen: React.FC = () => {
   const [polygonCoordinates, setPolygonCoordinates] = useState<Coordinate[]>(
     []
   );
+  const [lasopolygonCoordinates, setlasoPolygonCoordinates] = useState([]);
+
   const [distance, setDistance] = useState(0);
   const [lassoArea, setLassoArea] = useState(0);
   const [mapRegion, setMapRegion] = useState({
@@ -300,8 +317,8 @@ const HomeScreen: React.FC = () => {
   };
 
   const addPolygonCoordinate = (coordinate: any) => {
-    const newCoordinates: any = [...polygonCoordinates, coordinate];
-    setPolygonCoordinates(newCoordinates);
+    const newCoordinates: any = [...lasopolygonCoordinates, coordinate];
+    setlasoPolygonCoordinates(newCoordinates);
     const area = calculatePolygonArea(newCoordinates);
     setLassoArea(area);
   };
@@ -393,12 +410,15 @@ const HomeScreen: React.FC = () => {
 
   const deletePolygon = () => {
     setPolygonCoordinates([]);
+    setlasoPolygonCoordinates([]);
     setIsDrawing(false);
     setLassoArea(0);
   };
 
   console.log("Line Coordinates:", lineCoordinates);
   console.log("Polygon Coordinates:", polygonCoordinates);
+  console.log("Lasso Polygon Coordinates:", lasopolygonCoordinates);
+
   return (
     <View style={styles.container}>
       {/* <View style={{ marginTop: 37 }} /> */}
@@ -411,9 +431,10 @@ const HomeScreen: React.FC = () => {
           lassoArea={lassoArea}
           onMapGuidChange={handleMapGuidChange} // Pass the callback function
         />
+
         <MapView
           provider={PROVIDER_GOOGLE}
-          mapType="satellite"
+          mapType={selectedMapType}
           ref={mapRef}
           style={styles.map}
           onPress={handleMapPress}
@@ -429,6 +450,14 @@ const HomeScreen: React.FC = () => {
           {lineCoordinates.map((coordinate, index) => (
             <Marker key={index} coordinate={coordinate} />
           ))}
+          {lasopolygonCoordinates.length > 0 && (
+            <Polygon
+              coordinates={lasopolygonCoordinates}
+              strokeColor="rgba(255, 255, 0, 1)" // Fully opaque yellow
+              fillColor="rgba(255, 255, 0, 0.3)" // Slightly transparent yellow
+              strokeWidth={2}
+            />
+          )}
           {polygonCoordinates.map((polygon: any, index: any) => (
             <Polygon
               key={index}
@@ -470,9 +499,48 @@ const HomeScreen: React.FC = () => {
           >
             <Icon name="linear-scale" size={24} color="#fff" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={clearMeasurements}>
-            <Icon name="delete" size={24} color="#fff" />
-          </TouchableOpacity>
+          <View>
+            <TouchableOpacity
+              style={{
+                backgroundColor: "green",
+                padding: 5,
+                paddingVertical: 10,
+                borderRadius: 5,
+                marginBottom: dropdown1 ? 2 : 10,
+                alignItems: "center",
+                justifyContent: "center",
+                flexDirection: "row",
+              }}
+            >
+              <Icon name="map" size={24} color="#fff" />
+              {dropdown1 ? (
+                <TouchableOpacity onPress={() => setDropdown1(false)}>
+                  <Entypo name="chevron-up" color="#fff" size={18} />
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity onPress={() => setDropdown1(true)}>
+                  <Entypo name="chevron-down" color="#fff" size={18} />
+                </TouchableOpacity>
+              )}
+            </TouchableOpacity>
+            {dropdown1 && (
+              <View style={styles.dropdown}>
+                {transferLanguage.map((item: any) => (
+                  <TouchableOpacity
+                    key={item.id}
+                    style={styles.dropdownItem}
+                    onPress={() => {
+                      setSelectedMapType(item.name);
+                      setDropdown1(false);
+                    }}
+                  >
+                    <Text style={styles.dropdownText}>{item.name}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+          </View>
+
           <TouchableOpacity style={styles.button} onPress={zoomIn}>
             <Icon name="zoom-in" size={24} color="#fff" />
           </TouchableOpacity>
@@ -539,6 +607,33 @@ const styles = StyleSheet.create({
   distanceText: {
     color: "#fff",
     fontWeight: "bold",
+  },
+  dropdown: {
+    position: "relative",
+    zIndex: 1,
+    backgroundColor: "green",
+    width: "100%",
+    padding: RFPercentage(0.3),
+    marginBottom: RFPercentage(0.5),
+    borderRadius: RFPercentage(0.5),
+  },
+  dropdownItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: RFPercentage(0.4),
+  },
+  buttonText: {
+    color: "#fffff",
+    fontSize: RFPercentage(1.3),
+  },
+  dropdownIcon: {
+    width: RFPercentage(2),
+    height: RFPercentage(2),
+  },
+  dropdownText: {
+    marginLeft: RFPercentage(1),
+    fontSize: RFPercentage(1),
+    color: "#ACAFB5",
   },
 });
 
