@@ -16,7 +16,7 @@ const Header: React.FC = (props) => {
       />
       <Button
         title="Login"
-        onPress={() => navigation.navigate("login")}
+        onPress={() => navigation.navigate("HomeScreen")}
         color="green"
       />
     </View>
