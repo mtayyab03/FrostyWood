@@ -403,7 +403,6 @@ const HomeScreen: React.FC = () => {
   };
 
   const deletePolygon = () => {
-    setPolygonCoordinates([]);
     setlasoPolygonCoordinates([]);
     setIsDrawing(false);
     setLassoArea(0);
@@ -509,11 +508,11 @@ const HomeScreen: React.FC = () => {
               <Icon name="map" size={24} color="#fff" />
               {dropdown1 ? (
                 <TouchableOpacity onPress={() => setDropdown1(false)}>
-                  <Entypo name="chevron-up" color="#fff" size={18} />
+                  <Entypo name="chevron-up" color="#fff" size={22} />
                 </TouchableOpacity>
               ) : (
                 <TouchableOpacity onPress={() => setDropdown1(true)}>
-                  <Entypo name="chevron-down" color="#fff" size={18} />
+                  <Entypo name="chevron-down" color="#fff" size={22} />
                 </TouchableOpacity>
               )}
             </TouchableOpacity>
@@ -541,11 +540,11 @@ const HomeScreen: React.FC = () => {
           <TouchableOpacity style={styles.button} onPress={zoomOut}>
             <Icon name="zoom-out" size={24} color="#fff" />
           </TouchableOpacity>
-          {/* {polygonCoordinates.length > 0 && (
-            <TouchableOpacity style={styles.button} onPress={deletePolygon}>
-              <Icon name="delete" size={24} color="#fff" />
-            </TouchableOpacity>
-          )} */}
+
+          <TouchableOpacity style={styles.button} onPress={deletePolygon}>
+            <Icon name="delete" size={24} color="#fff" />
+          </TouchableOpacity>
+
           <TouchableOpacity style={styles.button} onPress={getCurrentLocation}>
             <Icon name="location-on" size={24} color="#fff" />
           </TouchableOpacity>
@@ -625,9 +624,9 @@ const styles = StyleSheet.create({
     height: RFPercentage(2),
   },
   dropdownText: {
-    marginLeft: RFPercentage(1),
-    fontSize: RFPercentage(1),
-    color: "#ACAFB5",
+    marginHorizontal: RFPercentage(0.5),
+    fontSize: RFPercentage(1.5),
+    color: "#ffffff",
   },
 });
 
